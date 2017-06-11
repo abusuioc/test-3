@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import busu.test3.datasource.EndlessDataSource;
+import busu.test3.datasource.EndlessListDataSource;
 import busu.test3.endless.EndlessListAdapter;
 
 /**
@@ -15,7 +15,7 @@ public class BooksListAdapter extends EndlessListAdapter<String> {
 
     private final static int TYPE_BOOK = TYPE_LOADING + 1;
 
-    public BooksListAdapter(@NonNull EndlessDataSource<String> cache) {
+    public BooksListAdapter(@NonNull EndlessListDataSource<String> cache) {
         super(cache);
     }
 

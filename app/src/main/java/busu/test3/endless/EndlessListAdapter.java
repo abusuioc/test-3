@@ -3,13 +3,12 @@ package busu.test3.endless;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import busu.test3.R;
-import busu.test3.datasource.EndlessDataSource;
+import busu.test3.datasource.EndlessListDataSource;
 
 /**
  * TODO: add class header
@@ -17,16 +16,15 @@ import busu.test3.datasource.EndlessDataSource;
 
 public class EndlessListAdapter<Data> extends RecyclerView.Adapter<EndlessListAdapter.BaseVH> {
 
-    protected final EndlessDataSource<Data> mDataSource;
+    protected final EndlessListDataSource<Data> mDataSource;
 
     public final static int TYPE_LOADING = 1;
     public final static int TYPE_NULL = -1;
 
-    public EndlessListAdapter(@NonNull EndlessDataSource<Data> dataSource) {
+    public EndlessListAdapter(@NonNull EndlessListDataSource<Data> dataSource) {
         mDataSource = dataSource;
         mDataSource.updates().subscribe(updateEvent -> {
             notifyDataSetChanged();
-            Log.i("DS", updateEvent.toString());
         });
     }
 
@@ -44,10 +42,15 @@ public class EndlessListAdapter<Data> extends RecyclerView.Adapter<EndlessListAd
         return TYPE_NULL;
     }
 
+    /**
+     * To allow for automatic loading of new items in the underlying {@link EndlessListDataSource}, pretend there is an extra element at the end of the list.
+     * If the data source is depleted, that's no longer needed.
+     * @return
+     */
     @Override
     public final int getItemCount() {
-        final int dsSize = mDataSource.getItemCount();
-        return mDataSource.hasReachTheEnd() ? dsSize : dsSize + 1;
+        final int count = mDataSource.getTotalCount();
+        return mDataSource.isDepleted() ? count : count + 1;
     }
 
     protected final boolean hasToProduceAnotherViewType(int type) {
