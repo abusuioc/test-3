@@ -13,14 +13,9 @@ import com.google.api.services.books.Books;
 import com.google.api.services.books.BooksRequestInitializer;
 import com.google.api.services.books.model.Volumes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import busu.mvvm.activity.BaseMvvmActivity;
 import busu.mvvm.activity.RequiresActivityViewModel;
-import busu.test3.datasource.EndlessListDataSource;
+import busu.test3.gbooks.BooksListAdapter;
 
 @RequiresActivityViewModel(MainAVM.class)
 public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefreshLayout.OnRefreshListener {
@@ -36,14 +31,6 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
         initVisuals();
         initList();
         doSomeWiring();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                makeDemoBooksCall();
-            }
-        }).start();
-
-
     }
 
     private void initVisuals() {
@@ -53,44 +40,21 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
     }
 
     private void initList() {
-        mAdapter = new BooksListAdapter(viewModel().getDataSource(), bindToLifecycle());
+        mAdapter = new BooksListAdapter(viewModel().getBooksDataSource(), bindToLifecycle());
         mViewList.setLayoutManager(new LinearLayoutManager(this));
         mViewList.setAdapter(mAdapter);
     }
 
     private void doSomeWiring() {
-        viewModel().getDataSource().updates()
+        viewModel().getBooksDataSource().updates()
                 .compose(bindToLifecycle())
                 .subscribe(result -> {
-                    mCacheStats.setText("Cache stats > " + viewModel().getDataSource().toString() + (result.isSuccessful() ? "" : " " + result.error()));
+                    mCacheStats.setText("Cache stats > " + viewModel().getBooksDataSource().toString() + (result.isSuccessful() ? "" : " " + result.error()));
                 });
     }
 
     @Override
     public void onRefresh() {
 
-    }
-
-
-    private void makeDemoBooksCall() {
-        try {
-            final String APPLICATION_NAME = "Busu-Test3/1.0";
-            final String QUERY = "007";
-
-            // Set up Books client.
-            final Books books = new Books.Builder(AndroidHttp.newCompatibleTransport(), JacksonFactory.getDefaultInstance(), null)
-                    .setApplicationName(APPLICATION_NAME)
-                    .setGoogleClientRequestInitializer(new BooksRequestInitializer(BuildConfig.BOOKS_API_KEY))
-                    .build();
-
-            Books.Volumes.List volumesList = books.volumes().list(QUERY);
-//            volumesList.setFilter("ebooks");
-
-            // Execute the query.
-            Volumes volumes = volumesList.execute();
-            final int totalItems = volumes.getTotalItems();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

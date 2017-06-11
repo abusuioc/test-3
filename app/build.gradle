@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
+def String getBooksApiKeyFromLocalProperties() {
+    def properties = new Properties()
+    def propertiesFile = project.rootProject.file('local.properties')
+    if (propertiesFile.exists()) {
+        properties.load(propertiesFile.newDataInputStream())
+    }
 
-def properties = new Properties()
-def propertiesFile = project.rootProject.file('local.properties')
-if (propertiesFile.exists()) {
-    properties.load(propertiesFile.newDataInputStream())
+    return properties.getProperty('books.api.key', 'books.api.key missing from local.properties')
 }
-
-def BOOKS_API_KEY = properties.hasProperty('books.api.key') ? properties.getProperty('books.api.key') : 'enter_API_key_in_local.properties_file'
 
 android {
     compileSdkVersion 25
@@ -20,7 +21,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "BOOKS_API_KEY", "\"${BOOKS_API_KEY}\""
+
+
+        buildConfigField "String", "BOOKS_API_KEY", "\"${getBooksApiKeyFromLocalProperties()}\""
     }
 
     buildTypes {

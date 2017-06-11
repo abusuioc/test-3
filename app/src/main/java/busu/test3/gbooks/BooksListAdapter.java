@@ -1,8 +1,10 @@
-package busu.test3;
+package busu.test3.gbooks;
 
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.api.services.books.model.Volume;
 
 import busu.test3.datasource.EndlessListDataSource;
 import busu.test3.endless.EndlessListAdapter;
@@ -12,12 +14,12 @@ import rx.Observable;
  * TODO: add a class header comment!
  */
 
-public class BooksListAdapter extends EndlessListAdapter<String> {
+public class BooksListAdapter extends EndlessListAdapter<Volume> {
 
     private final static int TYPE_BOOK = TYPE_LOADING + 1;
 
-    public BooksListAdapter(@NonNull EndlessListDataSource<String> cache, @NonNull Observable.Transformer lifecycleEvents) {
-        super(cache, lifecycleEvents);
+    public BooksListAdapter(@NonNull BooksDataSource dataSource, @NonNull Observable.Transformer lifecycleEvents) {
+        super(dataSource, lifecycleEvents);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class BooksListAdapter extends EndlessListAdapter<String> {
 
         @Override
         public void onBindVH(int positionInList) {
-            mTitle.setText(mDataSource.getDataAt(positionInList));
+            mTitle.setText(mDataSource.getDataAt(positionInList).getVolumeInfo().getTitle());
         }
     }
 }

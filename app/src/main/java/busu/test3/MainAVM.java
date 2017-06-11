@@ -10,11 +10,12 @@ import javax.annotation.Nonnull;
 
 import busu.mvvm.activity.ActivityViewModel;
 import busu.test3.datasource.EndlessListDataSource;
+import busu.test3.gbooks.BooksDataSource;
 
 
 public class MainAVM extends ActivityViewModel<MainActivity> {
 
-    private EndlessListDataSource<String> mDS;
+    private BooksDataSource mBooksDS;
 
 
     public MainAVM(@NonNull Application application) {
@@ -25,13 +26,13 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
 
     private void initDataSource() {
         EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.DefaultConfig();
-        mDS = produceTestingLimitedElementsDS(cacheConfig);
+        mBooksDS = new BooksDataSource(cacheConfig, "cars");
     }
 
 
     //outputs
-    public EndlessListDataSource<String> getDataSource() {
-        return mDS;
+    public BooksDataSource getBooksDataSource() {
+        return mBooksDS;
     }
 
 
