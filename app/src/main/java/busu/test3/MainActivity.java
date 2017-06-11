@@ -35,7 +35,7 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
         setContentView(R.layout.main);
         initVisuals();
         initList();
-
+        doSomeWiring();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -53,77 +53,17 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
     }
 
     private void initList() {
-
-        EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.DefaultConfig();
-        EndlessListDataSource<String> testEndlessDS = new EndlessListDataSource<String>(cacheConfig) {
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                Thread.sleep(1000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                for (int i = 0; i < request.count(); i++) {
-                    data.add("endless_" + (request.from() + i));
-                }
-                return data;
-            }
-        };
-
-        EndlessListDataSource<String> testFixedSizeDS = new EndlessListDataSource<String>(cacheConfig) {
-
-            private List<String> elm;
-
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                if (elm == null) {
-                    int size = cacheConfig.keepSize() + cacheConfig.pageSize() * 2;
-                    elm = new ArrayList<>(size);
-                    for (int i = 0; i < size; i++) {
-                        elm.add("fixed_" + i);
-                    }
-                }
-                Thread.sleep(1000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                int howMuchToAdd = Math.min(request.count(), elm.size() - request.from());
-                for (int i = 0; i < howMuchToAdd; i++) {
-                    data.add(elm.get(request.from() + i));
-                }
-                return data;
-            }
-        };
-
-        EndlessListDataSource<String> testErroringDS = new EndlessListDataSource<String>(cacheConfig) {
-
-            private List<String> elm;
-
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                if (elm == null) {
-                    int size = cacheConfig.keepSize() + cacheConfig.pageSize() * 2;
-                    elm = new ArrayList<>(size);
-                    for (int i = 0; i < size; i++) {
-                        elm.add("erroring_" + i);
-                    }
-                }
-                Thread.sleep(1000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                int howMuchToAdd = Math.min(request.count(), elm.size() - request.from());
-                for (int i = 0; i < howMuchToAdd; i++) {
-                    data.add(elm.get(request.from() + i));
-                }
-                if (request.from() > cacheConfig.pageSize()) {
-                    throw new Throwable("error fetching");
-                }
-                return data;
-            }
-        };
-
-        testFixedSizeDS.updates().subscribe(result -> {
-            mCacheStats.setText("Cache stats > " + testFixedSizeDS.toString() + (result.isSuccessful() ? "" : " " + result.error()));
-        });
-
-
-        mAdapter = new BooksListAdapter(testFixedSizeDS);
+        mAdapter = new BooksListAdapter(viewModel().getDataSource(), bindToLifecycle());
         mViewList.setLayoutManager(new LinearLayoutManager(this));
         mViewList.setAdapter(mAdapter);
+    }
+
+    private void doSomeWiring() {
+        viewModel().getDataSource().updates()
+                .compose(bindToLifecycle())
+                .subscribe(result -> {
+                    mCacheStats.setText("Cache stats > " + viewModel().getDataSource().toString() + (result.isSuccessful() ? "" : " " + result.error()));
+                });
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import busu.test3.R;
 import busu.test3.datasource.EndlessListDataSource;
+import rx.Observable;
 
 /**
  * TODO: add class header
@@ -21,16 +22,17 @@ public class EndlessListAdapter<Data> extends RecyclerView.Adapter<EndlessListAd
     public final static int TYPE_LOADING = 1;
     public final static int TYPE_NULL = -1;
 
-    public EndlessListAdapter(@NonNull EndlessListDataSource<Data> dataSource) {
+    /**
+     * @param dataSource
+     * @param lifecycleEvents must be provided to automatically control when the subscription to the {@link EndlessListDataSource} must finish
+     */
+    public EndlessListAdapter(@NonNull EndlessListDataSource<Data> dataSource, @NonNull Observable.Transformer lifecycleEvents) {
         mDataSource = dataSource;
-        mDataSource.updates().subscribe(updateEvent -> {
-            notifyDataSetChanged();
-        });
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(position);
+        mDataSource.updates()
+                .compose(lifecycleEvents)
+                .subscribe(updateEvent -> {
+                    notifyDataSetChanged();
+                });
     }
 
     @Override
@@ -45,16 +47,25 @@ public class EndlessListAdapter<Data> extends RecyclerView.Adapter<EndlessListAd
     /**
      * To allow for automatic loading of new items in the underlying {@link EndlessListDataSource}, pretend there is an extra element at the end of the list.
      * If the data source is depleted, that's no longer needed.
+     *
      * @return
      */
     @Override
-    public final int getItemCount() {
+    @CallSuper
+    public int getItemCount() {
         final int count = mDataSource.getTotalCount();
         return mDataSource.isDepleted() ? count : count + 1;
     }
 
-    protected final boolean hasToProduceAnotherViewType(int type) {
-        return type != TYPE_LOADING;
+    /**
+     * Signals the super classes that the type is already defined
+     *
+     * @param type
+     * @return
+     */
+    @CallSuper
+    protected boolean isThisTypeAlreadyKnown(int type) {
+        return type == TYPE_LOADING;
     }
 
     @Override
