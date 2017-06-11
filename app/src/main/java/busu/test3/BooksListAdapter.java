@@ -1,76 +1,58 @@
 package busu.test3;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import busu.test3.datasource.EndlessDataSource;
+import busu.test3.endless.EndlessListAdapter;
 
 /**
  * TODO: add a class header comment!
  */
 
-public class BooksListAdapter extends RecyclerView.Adapter<BooksListAdapter.BaseVH> {
+public class BooksListAdapter extends EndlessListAdapter<String> {
+
+    private final static int TYPE_BOOK = TYPE_LOADING + 1;
+
+    public BooksListAdapter(@NonNull EndlessDataSource<String> cache) {
+        super(cache);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        final int type = super.getItemViewType(position);
+        if (hasToProduceAnotherViewType(type)) {
+            return TYPE_BOOK;
+        }
+        return type;
+    }
 
     @Override
     public BaseVH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(BaseVH holder, int position) {
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return 0;
-    }
-
-    public abstract static class BaseVH extends RecyclerView.ViewHolder {
-
-        private BaseVH(View itemView) {
-            super(itemView);
-            init();
+        BaseVH holder = super.onCreateViewHolder(parent, viewType);
+        if (holder == null) {
+            holder = new BookVH(parent);
         }
-
-        public BaseVH(ViewGroup parent, int layoutRes) {
-            this(LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false));
-        }
-
-        public abstract void init();
-
-        public abstract void onBindVH(int positionInList);
-    }
-
-    public class LoadingVH extends BaseVH {
-
-        public LoadingVH(ViewGroup parent) {
-            super(parent, R.layout.list_item_loading);
-        }
-
-        @Override
-        public void init() {
-        }
-
-        @Override
-        public void onBindVH(int positionInList) {
-        }
+        return holder;
     }
 
     public class BookVH extends BaseVH {
 
+        private TextView mTitle;
+
         public BookVH(ViewGroup parent) {
-            super(parent, R.layout.list_item_loading);
+            super(parent, android.R.layout.simple_list_item_1);
         }
 
         @Override
         public void init() {
-
+            mTitle = (TextView) baseView();
         }
 
         @Override
         public void onBindVH(int positionInList) {
-
+            mTitle.setText(mDataSource.getDataAt(positionInList));
         }
     }
 }

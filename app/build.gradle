@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
 
 def properties = new Properties()
 def propertiesFile = project.rootProject.file('local.properties')
@@ -27,6 +29,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -41,4 +47,5 @@ dependencies {
     compile project(path: ':lib-mvvm')
     compile 'com.google.apis:google-api-services-books:v1-rev92-1.22.0'
     compile 'com.google.http-client:google-http-client-android:1.22.0'
+    provided 'com.google.auto.value:auto-value:1.3'
 }

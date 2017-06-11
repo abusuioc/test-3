@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray"
+        android:textColor="@android:color/white"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:id="@+id/main_cache_stats"/>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/main_refresh"
         android:layout_width="match_parent"
