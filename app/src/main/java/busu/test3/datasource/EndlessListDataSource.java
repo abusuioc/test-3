@@ -247,7 +247,7 @@ public abstract class EndlessListDataSource<Data> {
      */
     @Override
     public String toString() {
-        return "total:" + mCache.size() + ", offset:" + mOffset;
+        return "size: " + mCache.size() + ", gap:" + mOffset;
     }
 
 

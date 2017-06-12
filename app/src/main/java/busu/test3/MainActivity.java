@@ -78,7 +78,7 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> {
         viewModel().getBooksDataSource().updates()
                 .compose(bindToLifecycle())
                 .subscribe(result -> {
-                    mCacheStats.setText("Cache stats > " + viewModel().getBooksDataSource().toString() + (result.isSuccessful() ? "" : " " + result.error()));
+                    mCacheStats.setText(result.isSuccessful() ? ("Cache stats > " + viewModel().getBooksDataSource().toString()) : ("Error: \n" + result.error()));
                 });
 
         viewModel().outstartAnotherActivity()

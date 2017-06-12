@@ -33,16 +33,6 @@
         android:background="#eee"
         android:orientation="horizontal">
 
-        <CheckBox
-            android:id="@+id/main_preemptive"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="#999"
-            android:textSize="40sp"
-            android:padding="1dp"
-            android:text="↕" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
