@@ -5,18 +5,19 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/main_cache_stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/darker_gray"
-        android:textColor="@android:color/white"
-        android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:id="@+id/main_cache_stats"/>
+        android:paddingTop="2dp"
+        android:textColor="@android:color/white" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/main_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/main_list"
@@ -25,4 +26,103 @@
             android:scrollbars="vertical" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#eee"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/main_preemptive"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:background="#999"
+            android:textSize="40sp"
+            android:padding="1dp"
+            android:text="↕" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="#bbb"
+            android:orientation="vertical"
+            android:padding="1dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="set page size:" />
+
+            <RadioGroup
+                android:id="@+id/main_page_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:checkedButton="@+id/main_page_size_2"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/main_page_size_2"
+                    style="@style/MainRadioButton"
+                    android:text="2" />
+
+                <RadioButton
+                    android:id="@+id/main_page_size_6"
+                    style="@style/MainRadioButton"
+                    android:text="6" />
+
+                <RadioButton
+                    android:id="@+id/main_page_size_20"
+                    style="@style/MainRadioButton"
+                    android:text="20" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="#ddd"
+            android:orientation="vertical"
+            android:padding="1dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="set cache size:" />
+
+            <RadioGroup
+                android:id="@+id/main_cache_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:checkedButton="@+id/main_cache_size_10"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/main_cache_size_10"
+                    style="@style/MainRadioButton"
+                    android:text="10" />
+
+                <RadioButton
+                    android:id="@+id/main_cache_size_30"
+                    style="@style/MainRadioButton"
+                    android:text="30" />
+
+                <RadioButton
+                    android:id="@+id/main_cache_size_1000"
+                    style="@style/MainRadioButton"
+                    android:text="1000" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

@@ -22,18 +22,9 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
     }
 
     private void initDataSource() {
-        EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.Config() {
-            @Override
-            public int pageSize() {
-                return 40;
-            }
-
-            @Override
-            public int keepSize() {
-                return 100000;
-            }
-        };
-        mBooksDS = new BooksDataSource(cacheConfig);
+        mBooksDS = new BooksDataSource();
+        mBooksDS.changePageSizeTo(2);
+        mBooksDS.changeCacheSizeTo(10);
     }
 
     private void doInputToOutputWiring() {

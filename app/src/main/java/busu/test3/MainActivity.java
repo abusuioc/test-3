@@ -7,6 +7,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -50,6 +52,17 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> {
         });
         mViewList = (RecyclerView) findViewById(R.id.main_list);
         mCacheStats = (TextView) findViewById(R.id.main_cache_stats);
+        //
+        ((RadioGroup) findViewById(R.id.main_page_size)).setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton checkedBtn = (RadioButton) group.findViewById(checkedId);
+            int pageSize = Integer.parseInt(checkedBtn.getText().toString());
+            viewModel().getBooksDataSource().changePageSizeTo(pageSize);
+        });
+        ((RadioGroup) findViewById(R.id.main_cache_size)).setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton checkedBtn = (RadioButton) group.findViewById(checkedId);
+            int cacheSize = Integer.parseInt(checkedBtn.getText().toString());
+            viewModel().getBooksDataSource().changeCacheSizeTo(cacheSize);
+        });
     }
 
     private void initList() {

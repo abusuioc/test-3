@@ -17,8 +17,7 @@ public class BooksDataSource extends EndlessListDataSource<Volume> {
 
     private final Books mBooks;
 
-    public BooksDataSource(Config dataSourceConfig) {
-        super(dataSourceConfig);
+    public BooksDataSource() {
         mBooks = BooksUtilities.setupBooksClient();
     }
 

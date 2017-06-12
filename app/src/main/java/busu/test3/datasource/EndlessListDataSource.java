@@ -1,5 +1,6 @@
 package busu.test3.datasource;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -18,9 +19,9 @@ import rx.subjects.PublishSubject;
 /**
  * Data source for an endless list
  * Supports:
- * - caching of a continuous window of elements (defined by {@link Config#keepSize()}
+ * - caching of a continuous window of elements - defined by {@link #cacheSize}
  * - discarding of elements that fall outside this window (i.e. older elements that are not visible anymore)
- * - requests new pages {@link Config#pageSize()} of data at the beginning or end of the window
+ * - requests new pages {@link #pageSize} of data at the beginning or end of the window
  * - automatic management of cache misses based on calls to {@link EndlessListDataSource#getDataAt(int)} {@see doTheRequest}
  * - manual management of requests for new data based on calls to {@link EndlessListDataSource#requestNewPageOfData(DIRECTION)}
  * - provides a reactive stream of request results (= data source changes)
@@ -28,9 +29,13 @@ import rx.subjects.PublishSubject;
 
 public abstract class EndlessListDataSource<Data> {
 
-    private final ArrayList<Data> mCache = new ArrayList<>(new DefaultConfig().pageSize());
-    private Config mConfig;
+    public final static int DEFAULT_PAGE_SIZE = 20;
+    public final static int DEFAULT_CACHE_SIZE = 100;
 
+    private int pageSize = DEFAULT_PAGE_SIZE;
+    private int cacheSize = DEFAULT_CACHE_SIZE;
+
+    private final ArrayList<Data> mCache = new ArrayList<>(DEFAULT_CACHE_SIZE);
     /**
      * offset of the current contents of mCache (mCache.get(pos) is in fact : mOffset + pos in the list
      */
@@ -43,8 +48,7 @@ public abstract class EndlessListDataSource<Data> {
     private PublishSubject<WorkRequest> mRequestTrigger = PublishSubject.create();
     private BehaviorSubject<WorkResult> mUpdates = BehaviorSubject.create();
 
-    public EndlessListDataSource(Config config) {
-        mConfig = config;
+    public EndlessListDataSource() {
         //the trigger accepts just one request at a time and discards the other ones
         //use rxjava's operators (onBackpressureDrop, delay and rebatchRequests) to elegantly solve the sync
         mRequestTrigger
@@ -73,6 +77,26 @@ public abstract class EndlessListDataSource<Data> {
                 .rebatchRequests(1)
                 .subscribe(mUpdates);
 
+    }
+
+    /**
+     * The new request page size that will be applied at the next request for more data
+     * ! input is not validated !
+     *
+     * @param value
+     */
+    public void changePageSizeTo(int value) {
+        pageSize = value;
+    }
+
+    /**
+     * The new cache size that will be applied at the next trimming operation
+     * ! input is not validated !
+     *
+     * @param value
+     */
+    public void changeCacheSizeTo(int value) {
+        cacheSize = value;
     }
 
     /**
@@ -105,11 +129,11 @@ public abstract class EndlessListDataSource<Data> {
         int count;
         int startingIndex;
         if (direction == DIRECTION.FRONT) {
-            count = Math.min(mConfig.pageSize(), mOffset);
+            count = Math.min(pageSize, mOffset);
             startingIndex = mOffset - count;
         } else {
             startingIndex = mOffset + mCache.size();
-            count = mConfig.pageSize();
+            count = pageSize;
         }
         return WorkRequest.create(direction, count, startingIndex);
     }
@@ -152,12 +176,12 @@ public abstract class EndlessListDataSource<Data> {
     }
 
     /**
-     * Removes elements from the cache that are lo longer needed so that the cache size is kept to {@link Config#keepSize()}
+     * Removes elements from the cache that are lo longer needed so that the cache size is kept to {@link #cacheSize}
      *
      * @param direction
      */
     private void trim(DIRECTION direction) {
-        final int trimAmount = mCache.size() - mConfig.keepSize();
+        final int trimAmount = mCache.size() - cacheSize;
         if (trimAmount > 0) {
             if (direction == DIRECTION.FRONT) {
                 mCache.subList(0, trimAmount).clear();
@@ -226,33 +250,6 @@ public abstract class EndlessListDataSource<Data> {
         return "total:" + mCache.size() + ", offset:" + mOffset;
     }
 
-    /**
-     * Configures the data source properties
-     */
-    public interface Config {
-        /**
-         * @return How many elements per page (per request)
-         */
-        int pageSize();
-
-        /**
-         * @return How many elements to be kept in memory
-         */
-        int keepSize();
-    }
-
-    public static class DefaultConfig implements Config {
-
-        @Override
-        public int pageSize() {
-            return 30;
-        }
-
-        @Override
-        public int keepSize() {
-            return 100;
-        }
-    }
 
     /**
      * Where the data source loads new items
