@@ -1,17 +1,14 @@
 package busu.test3;
 
 import android.app.Application;
+import android.content.Intent;
 import android.support.annotation.NonNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import busu.mvvm.activity.ActivityViewModel;
 import busu.test3.datasource.EndlessListDataSource;
 import busu.test3.gbooks.BooksDataSource;
-
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
 public class MainAVM extends ActivityViewModel<MainActivity> {
 
@@ -20,13 +17,24 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
 
     public MainAVM(@NonNull Application application) {
         super(application);
-
         initDataSource();
+        doInputToOutputWiring();
     }
 
     private void initDataSource() {
         EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.DefaultConfig();
         mBooksDS = new BooksDataSource(cacheConfig, "cars");
+    }
+
+    private void doInputToOutputWiring() {
+        openBookAtPosition
+                .compose(bindToLifecycle())
+                .map(position ->
+                        getBooksDataSource().getDataAt(position))
+                .filter(volume -> volume != null)
+                .map(volume ->
+                        DetailAVM.buildStartingIntent(getApp(), volume.getId()))
+                .subscribe(startAnotherActivity);
     }
 
 
@@ -35,75 +43,19 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
         return mBooksDS;
     }
 
+    private final PublishSubject<Intent> startAnotherActivity = PublishSubject.create();
 
-    //some testing data sources - todo : this is temp
-    private EndlessListDataSource<String> produceTestingEndlessDS(
-            @NonNull EndlessListDataSource.Config config) {
-        return new EndlessListDataSource<String>(config) {
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                Thread.sleep(2000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                for (int i = 0; i < request.count(); i++) {
-                    data.add("endless_" + (request.from() + i));
-                }
-                return data;
-            }
-        };
+    public Observable<Intent> outstartAnotherActivity() {
+        return startAnotherActivity.asObservable();
     }
 
-    private EndlessListDataSource<String> produceTestingLimitedElementsDS(
-            @NonNull EndlessListDataSource.Config config) {
-        return new EndlessListDataSource<String>(config) {
+    //inputs
 
-            private List<String> elm;
+    private final PublishSubject<Integer> openBookAtPosition = PublishSubject.create();
 
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                if (elm == null) {
-                    int size = config.keepSize() + config.pageSize() * 2;
-                    elm = new ArrayList<>(size);
-                    for (int i = 0; i < size; i++) {
-                        elm.add("fixed_" + i);
-                    }
-                }
-                Thread.sleep(2000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                int howMuchToAdd = Math.min(request.count(), elm.size() - request.from());
-                for (int i = 0; i < howMuchToAdd; i++) {
-                    data.add(elm.get(request.from() + i));
-                }
-                return data;
-            }
-        };
+    public void inOpenBookAtPosition(int position) {
+        openBookAtPosition.onNext(position);
     }
 
-    private EndlessListDataSource<String> produceTestingErroringDS(
-            @NonNull EndlessListDataSource.Config config) {
-        return new EndlessListDataSource<String>(config) {
 
-            private List<String> elm;
-
-            @Override
-            protected List<String> doTheRequest(@Nonnull WorkRequest request) throws Throwable {
-                if (elm == null) {
-                    int size = config.keepSize() + config.pageSize() * 2;
-                    elm = new ArrayList<>(size);
-                    for (int i = 0; i < size; i++) {
-                        elm.add("erroring_" + i);
-                    }
-                }
-                Thread.sleep(2000);
-                ArrayList<String> data = new ArrayList<>(request.count());
-                int howMuchToAdd = Math.min(request.count(), elm.size() - request.from());
-                for (int i = 0; i < howMuchToAdd; i++) {
-                    data.add(elm.get(request.from() + i));
-                }
-                if (request.from() > config.pageSize()) {
-                    throw new Throwable("error fetching");
-                }
-                return data;
-            }
-        };
-    }
 }
