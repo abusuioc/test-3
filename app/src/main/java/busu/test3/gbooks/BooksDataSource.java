@@ -10,18 +10,16 @@ import java.util.List;
 import busu.test3.datasource.EndlessListDataSource;
 
 /**
- * TODO: add class header
+ * All the Google Books that contain "a" (lots of them!)
  */
 
 public class BooksDataSource extends EndlessListDataSource<Volume> {
 
     private final Books mBooks;
-    private final String mQuery;
 
-    public BooksDataSource(Config dataSourceConfig, String query) {
+    public BooksDataSource(Config dataSourceConfig) {
         super(dataSourceConfig);
         mBooks = BooksUtilities.setupBooksClient();
-        mQuery = query;
     }
 
     @NonNull
@@ -29,7 +27,7 @@ public class BooksDataSource extends EndlessListDataSource<Volume> {
     protected List<Volume> doTheRequest(@NonNull WorkRequest request) throws Throwable {
         return mBooks
                 .volumes()
-                .list(mQuery)
+                .list("a")
                 .setStartIndex((long) request.from())
                 .setMaxResults((long) request.count())
                 .execute()

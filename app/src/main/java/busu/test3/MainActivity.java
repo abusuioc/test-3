@@ -23,11 +23,12 @@ import busu.test3.endless.ItemClickSupport;
 import busu.test3.gbooks.BooksListAdapter;
 
 @RequiresActivityViewModel(MainAVM.class)
-public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseMvvmActivity<MainAVM> {
 
     private RecyclerView mViewList;
     private BooksListAdapter mAdapter;
     private TextView mCacheStats;
+    private SwipeRefreshLayout mRefresh;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +40,14 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
     }
 
     private void initVisuals() {
-        ((SwipeRefreshLayout) findViewById(R.id.main_refresh)).setOnRefreshListener(this);
+        mRefresh = (SwipeRefreshLayout) findViewById(R.id.main_refresh);
+        mRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mRefresh.setRefreshing(false);
+                viewModel().inRefreshList();
+            }
+        });
         mViewList = (RecyclerView) findViewById(R.id.main_list);
         mCacheStats = (TextView) findViewById(R.id.main_cache_stats);
     }
@@ -50,12 +58,7 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
         mViewList.setAdapter(mAdapter);
 
         ItemClickSupport.addTo(mViewList)
-                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                    @Override
-                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        viewModel().inOpenBookAtPosition(position);
-                    }
-                });
+                .setOnItemClickListener((recyclerView, position, v) -> viewModel().inOpenBookAtPosition(position));
     }
 
     private void doSomeWiring() {
@@ -68,10 +71,9 @@ public class MainActivity extends BaseMvvmActivity<MainAVM> implements SwipeRefr
         viewModel().outstartAnotherActivity()
                 .compose(bindToLifecycle())
                 .subscribe(intent -> startActivity(intent));
-    }
 
-    @Override
-    public void onRefresh() {
-
+        viewModel().outNotifyListChange()
+                .compose(bindToLifecycle())
+                .subscribe(__ -> mAdapter.notifyDataSetChanged());
     }
 }

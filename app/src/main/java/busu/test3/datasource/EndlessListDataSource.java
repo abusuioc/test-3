@@ -210,6 +210,12 @@ public abstract class EndlessListDataSource<Data> {
     @NonNull
     List<Data> doTheRequest(@NonNull WorkRequest request) throws Throwable;
 
+    public void clearCache() {
+        mIsDepleted = false;
+        mOffset = 0;
+        mCache.clear();
+    }
+
     /**
      * The current status of the data source
      *
@@ -239,12 +245,12 @@ public abstract class EndlessListDataSource<Data> {
 
         @Override
         public int pageSize() {
-            return 6;
+            return 30;
         }
 
         @Override
         public int keepSize() {
-            return 20;
+            return 100;
         }
     }
 

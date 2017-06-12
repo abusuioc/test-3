@@ -22,8 +22,18 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
     }
 
     private void initDataSource() {
-        EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.DefaultConfig();
-        mBooksDS = new BooksDataSource(cacheConfig, "cars");
+        EndlessListDataSource.Config cacheConfig = new EndlessListDataSource.Config() {
+            @Override
+            public int pageSize() {
+                return 40;
+            }
+
+            @Override
+            public int keepSize() {
+                return 100000;
+            }
+        };
+        mBooksDS = new BooksDataSource(cacheConfig);
     }
 
     private void doInputToOutputWiring() {
@@ -35,6 +45,10 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
                 .map(volume ->
                         DetailAVM.buildStartingIntent(getApp(), volume.getId()))
                 .subscribe(startAnotherActivity);
+        refreshList
+                .compose(bindToLifecycle())
+                .doOnNext(__ -> mBooksDS.clearCache())
+                .subscribe(notifyListChange);
     }
 
 
@@ -49,12 +63,24 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
         return startAnotherActivity.asObservable();
     }
 
+    private final PublishSubject<Void> notifyListChange = PublishSubject.create();
+
+    public Observable<Void> outNotifyListChange() {
+        return notifyListChange.asObservable();
+    }
+
     //inputs
 
     private final PublishSubject<Integer> openBookAtPosition = PublishSubject.create();
 
     public void inOpenBookAtPosition(int position) {
         openBookAtPosition.onNext(position);
+    }
+
+    private final PublishSubject<Void> refreshList = PublishSubject.create();
+
+    public void inRefreshList() {
+        refreshList.onNext(null);
     }
 
 
