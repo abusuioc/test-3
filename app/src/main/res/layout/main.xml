@@ -52,13 +52,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:checkedButton="@+id/main_page_size_2"
+                android:checkedButton="@+id/main_page_size_40"
                 android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/main_page_size_2"
-                    style="@style/MainRadioButton"
-                    android:text="2" />
 
                 <RadioButton
                     android:id="@+id/main_page_size_6"
@@ -69,6 +64,11 @@
                     android:id="@+id/main_page_size_20"
                     style="@style/MainRadioButton"
                     android:text="20" />
+
+                <RadioButton
+                    android:id="@+id/main_page_size_40"
+                    style="@style/MainRadioButton"
+                    android:text="40" />
 
             </RadioGroup>
 
@@ -93,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:checkedButton="@+id/main_cache_size_10"
+                android:checkedButton="@+id/main_cache_size_50"
                 android:orientation="horizontal">
 
                 <RadioButton
@@ -102,7 +102,7 @@
                     android:text="10" />
 
                 <RadioButton
-                    android:id="@+id/main_cache_size_30"
+                    android:id="@+id/main_cache_size_50"
                     style="@style/MainRadioButton"
                     android:text="30" />
 

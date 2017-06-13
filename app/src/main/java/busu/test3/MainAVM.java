@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import busu.mvvm.activity.ActivityViewModel;
-import busu.test3.datasource.EndlessListDataSource;
 import busu.test3.gbooks.BooksDataSource;
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -23,8 +22,8 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
 
     private void initDataSource() {
         mBooksDS = new BooksDataSource();
-        mBooksDS.changePageSizeTo(2);
-        mBooksDS.changeCacheSizeTo(10);
+        mBooksDS.changePageSizeTo(40);
+        mBooksDS.changeCacheSizeTo(50);
     }
 
     private void doInputToOutputWiring() {
