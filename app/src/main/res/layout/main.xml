@@ -27,92 +27,112 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <LinearLayout
+
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#eee"
-        android:orientation="horizontal">
+        android:background="#eee">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="#bbb"
-            android:orientation="vertical"
-            android:padding="1dp">
+            android:orientation="horizontal">
 
-            <TextView
+            <CheckBox
+                android:id="@+id/main_preemptive"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="#999"
+                android:checked="true"
+                android:padding="2dp"
+                android:text="preemptive\nscroll" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="set page size:" />
+                android:background="#bbb"
+                android:orientation="vertical"
+                android:padding="2dp">
 
-            <RadioGroup
-                android:id="@+id/main_page_size"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="set page size:" />
+
+                <RadioGroup
+                    android:id="@+id/main_page_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:checkedButton="@+id/main_page_size_40"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/main_page_size_6"
+                        style="@style/MainRadioButton"
+                        android:text="6" />
+
+                    <RadioButton
+                        android:id="@+id/main_page_size_20"
+                        style="@style/MainRadioButton"
+                        android:text="20" />
+
+                    <RadioButton
+                        android:id="@+id/main_page_size_40"
+                        style="@style/MainRadioButton"
+                        android:text="40" />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checkedButton="@+id/main_page_size_40"
-                android:orientation="horizontal">
+                android:layout_gravity="center_vertical"
+                android:background="#ddd"
+                android:orientation="vertical"
+                android:padding="2dp">
 
-                <RadioButton
-                    android:id="@+id/main_page_size_6"
-                    style="@style/MainRadioButton"
-                    android:text="6" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="set cache size:" />
 
-                <RadioButton
-                    android:id="@+id/main_page_size_20"
-                    style="@style/MainRadioButton"
-                    android:text="20" />
+                <RadioGroup
+                    android:id="@+id/main_cache_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:checkedButton="@+id/main_cache_size_200"
+                    android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/main_page_size_40"
-                    style="@style/MainRadioButton"
-                    android:text="40" />
+                    <RadioButton
+                        android:id="@+id/main_cache_size_10"
+                        style="@style/MainRadioButton"
+                        android:text="10" />
 
-            </RadioGroup>
+                    <RadioButton
+                        android:id="@+id/main_cache_size_50"
+                        style="@style/MainRadioButton"
+                        android:text="50" />
 
+                    <RadioButton
+                        android:id="@+id/main_cache_size_200"
+                        style="@style/MainRadioButton"
+                        android:text="200" />
+
+                    <RadioButton
+                        android:id="@+id/main_cache_size_1000"
+                        style="@style/MainRadioButton"
+                        android:text="1000" />
+
+                </RadioGroup>
+
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="#ddd"
-            android:orientation="vertical"
-            android:padding="1dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="set cache size:" />
-
-            <RadioGroup
-                android:id="@+id/main_cache_size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:checkedButton="@+id/main_cache_size_50"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/main_cache_size_10"
-                    style="@style/MainRadioButton"
-                    android:text="10" />
-
-                <RadioButton
-                    android:id="@+id/main_cache_size_50"
-                    style="@style/MainRadioButton"
-                    android:text="30" />
-
-                <RadioButton
-                    android:id="@+id/main_cache_size_1000"
-                    style="@style/MainRadioButton"
-                    android:text="1000" />
-
-            </RadioGroup>
-
-        </LinearLayout>
-    </LinearLayout>
+    </HorizontalScrollView>
 </LinearLayout>

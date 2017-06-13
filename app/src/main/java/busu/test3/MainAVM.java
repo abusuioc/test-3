@@ -23,7 +23,7 @@ public class MainAVM extends ActivityViewModel<MainActivity> {
     private void initDataSource() {
         mBooksDS = new BooksDataSource();
         mBooksDS.changePageSizeTo(40);
-        mBooksDS.changeCacheSizeTo(50);
+        mBooksDS.changeCacheSizeTo(200);
     }
 
     private void doInputToOutputWiring() {

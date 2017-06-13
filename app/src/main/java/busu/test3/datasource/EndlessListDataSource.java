@@ -1,6 +1,5 @@
 package busu.test3.datasource;
 
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -45,7 +44,7 @@ public abstract class EndlessListDataSource<Data> {
      */
     private boolean mIsDepleted;
 
-    private PublishSubject<WorkRequest> mRequestTrigger = PublishSubject.create();
+    private PublishSubject<DIRECTION> mRequestTrigger = PublishSubject.create();
     private BehaviorSubject<WorkResult> mUpdates = BehaviorSubject.create();
 
     public EndlessListDataSource() {
@@ -54,6 +53,8 @@ public abstract class EndlessListDataSource<Data> {
         mRequestTrigger
                 .onBackpressureDrop()
                 .delay(0, TimeUnit.MILLISECONDS, Schedulers.io())
+                .map(direction -> createWorkPackage(direction))
+                .filter(workRequest -> workRequest.isValid())
                 .map(work -> {
                     try {
                         final List<Data> data = doTheRequest(work);
@@ -209,7 +210,20 @@ public abstract class EndlessListDataSource<Data> {
      * @param direction
      */
     public void requestNewPageOfData(DIRECTION direction) {
-        mRequestTrigger.onNext(createWorkPackage(direction));
+        mRequestTrigger.onNext(direction);
+    }
+
+    /**
+     * Interfaces with preemptive data fetching based on the current position in the list and the direction of scroll
+     * @param direction
+     * @param position
+     */
+    public void requestNewPageOfDataBasedOnCurrentPosition(DIRECTION direction, int position) {
+        final int positionOfHalfTheCacheWindow = mCache.size() / 2 + mOffset;
+        if ((direction == DIRECTION.FRONT && position < positionOfHalfTheCacheWindow)
+                || (direction == DIRECTION.END && position > positionOfHalfTheCacheWindow)) {
+            requestNewPageOfData(direction);
+        }
     }
 
     /**
@@ -292,6 +306,10 @@ public abstract class EndlessListDataSource<Data> {
 
         public static WorkRequest create(DIRECTION direction, int count, int from) {
             return new AutoValue_EndlessListDataSource_WorkRequest(direction, count, from);
+        }
+
+        public boolean isValid() {
+            return count() > 0;
         }
     }
 
